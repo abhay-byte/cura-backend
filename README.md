@@ -12,6 +12,8 @@ This project is documented in two separate files for clarity:
 
 -   **[Agent Instructions](./docs/agent.md)**: Detailed instructions for backend developers on the expected behavior, input data, and output structure for the AI agents. (TASK YET TO BE COMPLETED)
 
+-   **[Database Schema](./docs/schema.md)**: Complete structure of all the data models used in this project. Working with SQL database. 
+
 ---
 
 ## 🚀 Getting Started
