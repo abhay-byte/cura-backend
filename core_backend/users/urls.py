@@ -1,5 +1,4 @@
-# api/urls.py
-
+# users/urls.py
 from django.urls import path
 from .views import signup_view, login_view
 
