@@ -10,7 +10,7 @@ This document provides general instructions for the backend developers implement
 -   **Input Data**: The agent should query the database for all `Reminder` objects where `is_active` is `True`. It needs to access the related `Medicine` and `User` data for each reminder.
 -   **Core Task**:
     1.  For each active reminder, check if the `reminder_time` matches the current time.
-    2.  If it's time for a reminder, generate a notification message.
+    2.  If it's time for a reminder, generate a notification message that includes the **`quantity`** to be taken (e.g., "Time to take 2 pills of Paracetamol").
     3.  Check the `inventory` of the associated `Medicine`. If the inventory is at or below the `refill_threshold`, generate a refill alert.
 -   **Output**: The agent's primary output is sending notifications (e.g., via email, push notification services). The endpoint itself can return a summary of actions taken.
     ```json
