@@ -15,8 +15,17 @@ class Medicine(models.Model):
         return f"{self.name} ({self.dosage}) for {self.user.username}"
 
 class Reminder(models.Model):
+    INSTRUCTION_CHOICES = [
+        ('Before Food', 'Before Food'),
+        ('After Food', 'After Food'),
+        ('With Food', 'With Food'),
+        ('Any Time', 'Any Time'),
+    ]
+
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='reminders')
     reminder_time = models.TimeField()
+    quantity = models.PositiveIntegerField(default=1)
+    instruction = models.CharField(max_length=20, choices=INSTRUCTION_CHOICES, default='Any Time')
     is_active = models.BooleanField(default=True)
     last_notified = models.DateTimeField(null=True, blank=True)
 

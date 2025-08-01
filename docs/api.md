@@ -74,14 +74,13 @@ These endpoints handle user creation and session management.
     ```
 
 ---
-
 ## 2. Reminder Agent Endpoints
 
 Handles management of medicines and their reminders.
 
 ### **Endpoint: `GET /reminder/medicines/`**
 
--   **Description**: Retrieves a list of all medicines for the authenticated user.
+-   **Description**: Retrieves a list of all medicines and their associated reminders for the authenticated user.
 -   **Authentication**: **Required**.
 -   **Success Response (200 OK)**:
     ```json
@@ -90,13 +89,21 @@ Handles management of medicines and their reminders.
         "id": 1,
         "name": "Paracetamol",
         "dosage": "500mg",
-        "inventory": 50
-      },
-      {
-        "id": 2,
-        "name": "Ibuprofen",
-        "dosage": "200mg",
-        "inventory": 30
+        "inventory": 50,
+        "reminders": [
+          {
+            "id": 101,
+            "time": "09:00",
+            "quantity": 1,
+            "instruction": "After Food"
+          },
+          {
+            "id": 102,
+            "time": "21:00",
+            "quantity": 1,
+            "instruction": "After Food"
+          }
+        ]
       }
     ]
     ```
@@ -121,33 +128,14 @@ Handles management of medicines and their reminders.
     }
     ```
 
-### **Endpoint: `GET /reminder/medicines/{id}/`**
-
--   **Description**: Retrieves details for a single medicine.
--   **Authentication**: **Required**.
--   **Success Response (200 OK)**:
-    ```json
-    {
-      "id": 1,
-      "name": "Paracetamol",
-      "dosage": "500mg",
-      "inventory": 50
-    }
-    ```
--   **Error Response (404 Not Found)**:
-    ```json
-    { "error": "Medicine not found." }
-    ```
-
 ### **Endpoint: `PUT /reminder/medicines/{id}/`**
 
--   **Description**: Updates the details for a single medicine. You can send any or all of the fields.
+-   **Description**: Updates the details for a single medicine.
 -   **Authentication**: **Required**.
 -   **Request Body**:
     ```json
     {
-      "inventory": 45,
-      "refill_threshold": 15
+      "inventory": 45
     }
     ```
 -   **Success Response (200 OK)**:
@@ -157,10 +145,46 @@ Handles management of medicines and their reminders.
 
 ### **Endpoint: `DELETE /reminder/medicines/{id}/`**
 
--   **Description**: Deletes a medicine.
+-   **Description**: Deletes a medicine and all its associated reminders.
 -   **Authentication**: **Required**.
--   **Success Response**: **204 No Content** with an empty body.
+-   **Success Response**: **204 No Content**.
 
+### **Endpoint: `POST /reminder/medicines/{medicine_id}/reminders/`**
+
+-   **Description**: Adds a new reminder for a specific medicine.
+-   **Authentication**: **Required**.
+-   **Request Body**:
+    ```json
+    {
+      "time": "08:30",
+      "quantity": 2,
+      "instruction": "Before Food"
+    }
+    ```
+-   **Success Response (201 Created)**:
+    ```json
+    {
+      "message": "Reminder added successfully.",
+      "reminder_id": 103
+    }
+    ```
+
+### **Endpoint: `POST /reminder/reminders/{reminder_id}/take/`**
+
+-   **Description**: Marks a dose as taken. This will decrease the medicine's inventory by the reminder's quantity.
+-   **Authentication**: **Required**.
+-   **Request Body**: None.
+-   **Success Response (200 OK)**:
+    ```json
+    {
+      "message": "Recorded that you took Paracetamol.",
+      "new_inventory": 49
+    }
+    ```
+-   **Error Response (400 Bad Request)**:
+    ```json
+    { "error": "Not enough medicine in inventory." }
+    ```
 ---
 
 ## 3. Diet Agent Endpoints
@@ -203,7 +227,8 @@ Handles user health profiles and personalized diet plans.
     { "message": "Profile updated." }
     ```
 
-### **Endpoint: `GET /diet/plan/`**
+### **Endpoint: `GET /diet/plan/`** (only gets one day's plan.)
+
 
 -   **Description**: Retrieves the user's current active diet plan.
 -   **Authentication**: **Required**.
@@ -225,7 +250,7 @@ Handles user health profiles and personalized diet plans.
     { "error": "No active diet plan found. Generate one first." }
     ```
 
-### **Endpoint: `POST /diet/plan/generate/`**
+### **Endpoint: `POST /diet/plan/generate/`** (only generate one day's plan.)
 
 -   **Description**: Triggers the Diet Agent to generate a new personalized diet plan based on the user's profile.
 -   **Authentication**: **Required**.
