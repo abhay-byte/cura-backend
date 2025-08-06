@@ -10,8 +10,9 @@ set -o errexit
 echo "--- Starting build process ---"
 
 # --- 1. Install All Project Dependencies ---
+# The --no-root flag tells Poetry to skip installing the main project package.
 echo "Installing all project dependencies via Poetry..."
-poetry install
+poetry install --no-root
 
 # --- 2. Run Database Migrations ---
 echo "Running Django database migrations..."
