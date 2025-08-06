@@ -1,6 +1,0 @@
-[submodule "agents/diet_agent_logic"]
-	path = agents/diet_agent_logic
-	url = https://github.com/PriyanshuGupta1102/Cura-diet-agent
-[submodule "agents/reminder_agent_logic"]
-	path = agents/reminder_agent_logic
-	url = https://github.com/PriyanshuGupta1102/cura-reminder-agent
