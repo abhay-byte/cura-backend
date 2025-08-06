@@ -14,7 +14,13 @@ echo "--- Starting build process ---"
 echo "Installing all project dependencies via Poetry..."
 poetry install --no-root
 
-# --- 2. Run Database Migrations ---
+# --- 2. Collect Static Files ---
+# This is a standard and required step for deploying Django projects.
+# It gathers all static files (CSS, JS, images) into a single directory.
+echo "Collecting static files..."
+poetry run python core_backend/manage.py collectstatic --no-input
+
+# --- 3. Run Database Migrations ---
 echo "Running Django database migrations..."
 poetry run python core_backend/manage.py migrate
 
