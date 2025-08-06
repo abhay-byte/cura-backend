@@ -10,10 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
+import sys 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Add the project's ROOT directory (CURA-BACKEND) to the Python path
+# This allows Django to find the 'agents' module.
+sys.path.insert(0, os.path.join(BASE_DIR.parent))
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'diet_agent',
     'reminder_agent',
+    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +133,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+CRON_CLASSES = [
+    "reminder_agent.cron.TriggerReminderAgentJob",
+]

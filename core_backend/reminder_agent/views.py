@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
+import requests # Import the requests library
 from .models import Medicine, Reminder
 
 # Helper to check ownership
@@ -139,21 +140,38 @@ def take_medicine(request, reminder_pk):
 
     return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
 
-
-
-# --- Agent Logic Placeholder ---
+# --- Agent Logic Placeholder (UPDATED) ---
 
 @csrf_exempt
-@login_required
+@login_required # Or remove this if the cron job will call it without a session
 def trigger_reminders(request):
     """
-    This is where the core AGENT logic for PS1 will go.
-    This endpoint would be called by a scheduler (e.g., Celery Beat, cron job).
+    This endpoint acts as a trigger. It calls the separate Flask-based
+    reminder agent service to perform the actual work of sending emails.
     """
-    # 1. Find all active reminders that are due.
-    # 2. Send interactive notifications (email, push, SMS).
-    # 3. Check medicine inventory and trigger refill alerts.
+    # The URL where the Flask reminder agent is running
+    reminder_agent_url = "http://127.0.0.1:5000/api/reminder/trigger/"
     
-    print("AGENT LOGIC: Checking and sending medication reminders...")
-    
-    return JsonResponse({'status': 'Reminder check initiated.'})
+    print(f"Forwarding request to reminder agent at: {reminder_agent_url}")
+
+    try:
+        # Make a GET request to the Flask agent
+        response = requests.get(reminder_agent_url, timeout=60) # 60-second timeout
+        
+        # Check if the agent responded successfully
+        if response.status_code == 200:
+            # Return the response from the agent directly to the client
+            agent_response_data = response.json()
+            print(f"Agent responded successfully: {agent_response_data}")
+            return JsonResponse(agent_response_data)
+        else:
+            # Handle cases where the agent returns an error
+            error_message = f"Reminder agent failed with status code {response.status_code}: {response.text}"
+            print(error_message)
+            return JsonResponse({'error': error_message}, status=502) # 502 Bad Gateway
+
+    except requests.exceptions.RequestException as e:
+        # Handle network errors (e.g., the agent service is down)
+        error_message = f"Could not connect to the reminder agent: {e}"
+        print(error_message)
+        return JsonResponse({'error': error_message}, status=503) # 503 Service Unavailable
