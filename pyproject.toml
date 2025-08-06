@@ -13,6 +13,8 @@ pydantic = "^2.11.7"
 python-dotenv = "^1.1.1"
 requests = "^2.32.4"
 django-cron = "^0.6.0"
+gunicorn = "^23.0.0"
+honcho = "^2.0.0"
 
 
 [build-system]
