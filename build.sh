@@ -10,9 +10,11 @@ set -o errexit
 echo "--- Starting build process ---"
 
 # --- 1. Initialize and Update Git Submodules ---
-# This is a critical step to ensure the agent code is actually cloned.
-echo "Initializing and updating submodules..."
-git submodule update --init --recursive
+# The 'git submodule sync' command updates the submodule URLs to match .gitmodules.
+# This fixes "No url found" errors.
+echo "Syncing and updating submodules to the latest version..."
+git submodule sync --recursive
+git submodule update --init --remote --merge
 
 # --- 2. Install All Project Dependencies ---
 # The --no-root flag tells Poetry to skip installing the main project package.
