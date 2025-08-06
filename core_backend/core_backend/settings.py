@@ -32,7 +32,11 @@ SECRET_KEY = "django-insecure-*=6l0609-!_^sfye6a@!%8l@lqqa3z5tg4$e%r2stvl6^!_jde
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'cura-backend-main-99c8.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Get the hostname from the Render environment variable
 # RENDER_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
