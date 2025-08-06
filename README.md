@@ -73,23 +73,18 @@ To run the complete application, you need to run **two separate servers** in **t
 
 1.  **Terminal 1: Start the Reminder Agent (Flask App)**
     ```bash
-    # Navigate to the reminder agent's directory
     cd agents/reminder_agent_logic/
 
-    # Install its specific dependencies (if it has a requirements.txt or similar)
     pip install -r requirements.txt 
 
-    # Run the Flask server
     python main.py
     ```
     *This server will typically run on `http://127.0.0.1:5000`.*
 
 2.  **Terminal 2: Start the Main Backend (Django App)**
     ```bash
-    # Navigate back to the project root
     cd ../..
 
-    # Run the Django server
     poetry run python core_backend/manage.py runserver
     ```
     *This server will run on `http://127.0.0.1:8000`.*
@@ -106,16 +101,14 @@ The system uses `django-cron` to schedule tasks, such as triggering the reminder
 
 ---
 
+## Deployment 
 
-### Running the Development Server
+This section contains information for deploying the project to a platform like Render.
 
-Once the setup is complete, you can start the Django development server:
+### Render Build Script (`build.sh`)
 
-```bash
-poetry run python core_backend/manage.py runserver
-```
+This script handles the complete build and startup process for the application on Render. It should be saved as `build.sh` in the project root and set as the **Build Command** in your Render service settings.
 
-The API will be accessible at http://127.0.0.1:8000/.
 
 ```
 Project Structure
@@ -133,6 +126,8 @@ Project Structure
 │   ├── agent.md      # Documentation for agent logic
 │   └── api.md        # Documentation for API endpoints
 ├── pyproject.toml    # Poetry dependency file
+├── run_crons.sh      # Cron Job for tasks
+├── build.sh          # Build and Run Production Application
 └── README.md         # This file
 ```
 ---
