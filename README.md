@@ -110,8 +110,9 @@ This section contains information for deploying the project to a platform like R
 This script handles the complete build and startup process for the application on Render. It should be saved as `build.sh` in the project root and set as the **Build Command** in your Render service settings.
 
 
+
+## Project Structure
 ```
-Project Structure
 .
 ├── agents            # Directory for agent submodules
 │   ├── diet_agent_logic
