@@ -3,6 +3,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from users.views import signup_view, login_view
+from core_backend.views import home_view 
+
 
 # Reminder Agent URLs
 reminder_urls = [
@@ -17,6 +19,7 @@ diet_urls = [
 ]
 
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     
     # Auth endpoints

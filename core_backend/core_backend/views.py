@@ -1,5 +1,3 @@
-# core_backend/core_backend/views.py
-
 from django.http import JsonResponse
 
 def home_view(request):
@@ -9,5 +7,5 @@ def home_view(request):
     return JsonResponse({
         'status': 'ok',
         'message': 'Welcome to the CURA AI Health Agents API!',
-        'documentation': 'https://github.com/abhay-byte/cura-backend/blob/main/docs/api.md' 
+        'documentation': 'https://github.com/abhay-byte/cura-backend/blob/main/docs/api.md'
     })
