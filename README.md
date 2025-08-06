@@ -10,7 +10,7 @@ This project is documented in two separate files for clarity:
 
 -   **[API Documentation](./docs/api.md)**: A comprehensive guide to all API endpoints, including request/response formats and authentication details. This is primarily for front-end developers.
 
--   **[Agent Instructions](./docs/agent.md)**: Detailed instructions for backend developers on the expected behavior, input data, and output structure for the AI agents. (TASK YET TO BE COMPLETED)
+-   **[Agent Instructions](./docs/agent.md)**: Detailed instructions for backend developers on the expected behavior, input data, and output structure for the AI agents. 
 
 -   **[Database Schema](./docs/schema.md)**: Complete structure of all the data models used in this project. Working with SQL database. 
 
@@ -39,23 +39,73 @@ These instructions will get you a copy of the project up and running on your loc
     poetry install
     ```
 
-3.  **Run database migrations:**
+3.  **Set Up Environment Variables:**
+    The agents require API keys and credentials.
+    -   **For the Diet Agent:** Create a file named `.env` in the root of the `CURA-BACKEND` directory. Add your Google API key:
+        ```
+        # .env
+        GOOGLE_API_KEY="AIzaSy...your...key...here"
+        ```
+    -   **For the Reminder Agent:** The reminder agent uses a separate `new.env` file inside its own directory (`agents/reminder_agent_logic/`). You will need to set up your email credentials there as per its documentation.
+
+
+4.  **Run database migrations:**
     This will set up your database schema based on the project's models.
     ```bash
     poetry run python core_backend/manage.py migrate
     ```
 
-4.  **Create a superuser (optional but recommended):**
+5.  **Create a superuser (optional but recommended):**
     This allows you to access the Django admin panel.
     ```bash
     poetry run python core_backend/manage.py createsuperuser
     ```
 
-5. **Adding the project's root directory to the Python path:** To allow Django to find the agent code
+6. **Adding the project's root directory to the Python path:** To allow Django to find the agent code
 
     ```bash
     poetry run python settings.py  
     ```
+
+### Running the Full System
+
+To run the complete application, you need to run **two separate servers** in **two separate terminals**.
+
+1.  **Terminal 1: Start the Reminder Agent (Flask App)**
+    ```bash
+    # Navigate to the reminder agent's directory
+    cd agents/reminder_agent_logic/
+
+    # Install its specific dependencies (if it has a requirements.txt or similar)
+    pip install -r requirements.txt 
+
+    # Run the Flask server
+    python main.py
+    ```
+    *This server will typically run on `http://127.0.0.1:5000`.*
+
+2.  **Terminal 2: Start the Main Backend (Django App)**
+    ```bash
+    # Navigate back to the project root
+    cd ../..
+
+    # Run the Django server
+    poetry run python core_backend/manage.py runserver
+    ```
+    *This server will run on `http://127.0.0.1:8000`.*
+
+### Automated Tasks (Cron Jobs)
+
+The system uses `django-cron` to schedule tasks, such as triggering the reminder agent. A helper script is provided to run these tasks.
+
+-   **To run manually:**
+    ```bash
+    ./run_crons.sh
+    ```
+-   **For production:** You would set up a system cron job to execute the `run_crons.sh` script periodically (e.g., every 5 minutes).
+
+---
+
 
 ### Running the Development Server
 
