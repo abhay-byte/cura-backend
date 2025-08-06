@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'users',
     'diet_agent',
     'reminder_agent',
-    'django_cron',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +127,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Add this line
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -134,6 +138,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-CRON_CLASSES = [
-    "reminder_agent.cron.TriggerReminderAgentJob",
+CRONJOBS = [
+    ('*/5 * * * *', 'reminder_agent.cron.trigger_reminder_agent_job'),
 ]
