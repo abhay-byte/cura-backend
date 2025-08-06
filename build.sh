@@ -11,6 +11,8 @@ echo "--- Starting build process ---"
 
 # --- 1. Initialize and Update Git Submodules ---
 # This is a critical step to ensure the agent code is actually cloned.
+echo "Initializing and updating submodules..."
+git submodule update --init --recursive
 
 # --- 2. Install All Project Dependencies ---
 # The --no-root flag tells Poetry to skip installing the main project package.
