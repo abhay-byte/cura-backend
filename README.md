@@ -29,7 +29,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/abhay-byte/cura-backend.git
+    git clone --recurse-submodules https://github.com/abhay-byte/cura-backend.git
+    cd cura-backend
     ```
 
 2.  **Install dependencies:**
@@ -50,6 +51,12 @@ These instructions will get you a copy of the project up and running on your loc
     poetry run python core_backend/manage.py createsuperuser
     ```
 
+5. **Adding the project's root directory to the Python path:** To allow Django to find the agent code
+
+    ```bash
+    poetry run python settings.py  
+    ```
+
 ### Running the Development Server
 
 Once the setup is complete, you can start the Django development server:
@@ -63,6 +70,9 @@ The API will be accessible at http://127.0.0.1:8000/.
 ```
 Project Structure
 .
+├── agents            # Directory for agent submodules
+│   ├── diet_agent_logic
+│   └── reminder_agent_logic
 ├── core_backend      # Main Django project directory
 │   ├── core_backend  # Project settings
 │   ├── diet_agent    # App for the Diet Agent
@@ -75,3 +85,11 @@ Project Structure
 ├── pyproject.toml    # Poetry dependency file
 └── README.md         # This file
 ```
+---
+## Credits
+
+A special thank you to my friend and collaborator for their work on the AI agents.
+
+-   **AI Agent Logic**: [PriyanshuGupta1102](https://github.com/PriyanshuGupta1102)
+    -   [Cura-diet-agent](https://github.com/PriyanshuGupta1102/Cura-diet-agent)
+    -   [cura-reminder-agent](https://github.com/PriyanshuGupta1102/cura-reminder-agent)

@@ -6,6 +6,20 @@ from django.contrib.auth.decorators import login_required
 import json
 from .models import UserProfile, DietPlan
 
+
+# --- Agent Integration ---
+# Import the actual agent function from the submodule at the project root.
+# This requires the project's root directory to be in Python's path.
+try:
+    from agents.diet_agent_logic.plan_generator import generate_diet_plan as get_structured_diet_plan
+except ImportError as e:
+    # This fallback prevents the server from crashing if the submodule is not found.
+    print(f"CRITICAL IMPORT ERROR: {e}")
+    def get_structured_diet_plan(user_input: str):
+        print("The 'diet_agent_logic' submodule could not be imported.")
+        print("Please ensure it is cloned correctly and that the project root is in sys.path.")
+        return None
+
 # --- User Profile Endpoint ---
 
 @csrf_exempt
@@ -62,77 +76,40 @@ def diet_plan_view(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-
 @csrf_exempt
 @login_required
 def generate_diet_plan(request):
-    """
-    This is where the core AGENT logic for PS2 will go.
-    """
     if request.method == 'POST':
         try:
             profile = UserProfile.objects.get(user=request.user)
         except UserProfile.DoesNotExist:
             return JsonResponse({'error': 'User profile not found. Please create it first.'}, status=400)
 
-        # 1. Get user profile data (age, weight, goals, allergies, etc.).
-        # 2. Pass this data to the Diet Agent (your AI/business logic).
-        # 3. The agent returns a structured diet plan (JSON).
-        # 4. Save the new plan and deactivate old ones.
+        # Creating a descriptive string from the user's profile to send to the agent
+        user_input_string = (
+            f"Generate a diet plan for a {profile.age}-year-old with the following details: "
+            f"Weight: {profile.weight_kg} kg, Height: {profile.height_cm} cm, "
+            f"Activity Level: {profile.activity_level}, Dietary Preference: {profile.dietary_preferences}. "
+            f"Allergies: {profile.allergies or 'None'}. "
+            f"Health Goals/Issues: {profile.health_issues or 'General Health'}."
+        )
         
-        print(f"AGENT LOGIC: Generating diet plan for {request.user.email}...")
-        
-        # --- PLACEHOLDER for Agent Response ---
-        # This is a complete, structured example of what the agent should return.
-        mock_diet_plan = {
-          "daily_calories": 2150,
-          "macronutrients": {
-            "protein_grams": 150,
-            "carbs_grams": 200,
-            "fat_grams": 80
-          },
-          "meals": {
-            "breakfast": {
-              "name": "Greek Yogurt with Almonds and Berries",
-              "time": "08:00",
-              "calories": 400,
-              "notes": "A great source of protein to start your day."
-            },
-            "lunch": {
-              "name": "Quinoa Salad with Chickpeas and Avocado",
-              "time": "13:00",
-              "calories": 650,
-              "notes": "Rich in fiber and healthy fats."
-            },
-            "snack": {
-              "name": "Apple with Peanut Butter",
-              "time": "16:00",
-              "calories": 250,
-              "notes": ""
-            },
-            "dinner": {
-              "name": "Baked Salmon with Asparagus and Sweet Potato",
-              "time": "19:30",
-              "calories": 850,
-              "notes": "Excellent source of Omega-3 fatty acids."
-            }
-          },
-          "grocery_list": [
-            "Greek Yogurt", "Almonds", "Mixed Berries", "Quinoa",
-            "Chickpeas", "Avocado", "Apple", "Peanut Butter",
-            "Salmon Fillet", "Asparagus", "Sweet Potato"
-          ],
-          "notes": "Remember to drink at least 8 glasses of water throughout the day."
-        }
-        # --- End Placeholder ---
+        # Calling the actual agent function from the submodule
+        plan_object = get_structured_diet_plan(user_input_string)
 
-        # Deactivate any previous plans for this user
+        if not plan_object:
+            return JsonResponse({'error': 'Failed to generate diet plan from the agent.'}, status=500)
+
+        # Convert the returned Pydantic object to a dictionary for saving
+        generated_plan_dict = plan_object.dict()
+
+        # Deactivate old plans
         DietPlan.objects.filter(user=request.user).update(is_active=False)
         
-        # Create the new active plan
+        # Creating new plan with the agent's response
         new_plan = DietPlan.objects.create(
             user=request.user,
-            plan_details=mock_diet_plan,
+            plan_details=generated_plan_dict,
             is_active=True
         )
 
