@@ -19,14 +19,16 @@ diet_urls = [
 ]
 
 urlpatterns = [
+    # This path handles the root URL
     path('', home_view, name='home'),
+    
+    # This path handles the admin site
     path('admin/', admin.site.urls),
     
-    # Auth endpoints
-    path('api/signup/', signup_view, name='signup'),
-    path('api/login/', login_view, name='login'),
+    # This single path now handles all auth routes (signup, login, etc.)
+    path('api/auth/', include('users.urls')),
     
-    # App-specific endpoints
-    path('api/reminder/', include(reminder_urls)),
-    path('api/diet/', include(diet_urls)),
+    # These are the paths for your other apps
+    path('api/reminder/', include('reminder_agent.urls')),
+    path('api/diet/', include('diet_agent.urls')),
 ]
