@@ -80,7 +80,6 @@ def diet_plan_view(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-
 @csrf_exempt
 @login_required
 def generate_diet_plan(request):
