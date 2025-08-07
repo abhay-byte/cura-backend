@@ -27,13 +27,21 @@ sys.path.insert(0, os.path.join(BASE_DIR.parent))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*=6l0609-!_^sfye6a@!%8l@lqqa3z5tg4$e%r2stvl6^!_jde'
+SECRET_KEY = "django-insecure-*=6l0609-!_^sfye6a@!%8l@lqqa3z5tg4$e%r2stvl6^!_jde"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'cura-backend-main-99c8.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
+# Get the hostname from the Render environment variable
+# RENDER_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+# if RENDER_HOSTNAME:
+#     ALLOWED_HOSTS.append(RENDER_HOSTNAME)
 
 # Application definition
 
@@ -47,7 +55,7 @@ INSTALLED_APPS = [
     'users',
     'diet_agent',
     'reminder_agent',
-    'django_cron',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +135,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Add this line
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -134,6 +146,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-CRON_CLASSES = [
-    "reminder_agent.cron.TriggerReminderAgentJob",
+CRONJOBS = [
+    ('*/5 * * * *', 'reminder_agent.cron.trigger_reminder_agent_job'),
 ]

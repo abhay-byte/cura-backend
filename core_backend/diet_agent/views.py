@@ -6,10 +6,8 @@ from django.contrib.auth.decorators import login_required
 import json
 from .models import UserProfile, DietPlan
 
-
 # --- Agent Integration ---
 # Import the actual agent function from the submodule at the project root.
-# This requires the project's root directory to be in Python's path.
 try:
     from agents.diet_agent_logic.plan_generator import generate_diet_plan as get_structured_diet_plan
 except ImportError as e:
@@ -21,44 +19,50 @@ except ImportError as e:
         return None
 
 # --- User Profile Endpoint ---
-
 @csrf_exempt
 @login_required
 def user_profile_view(request):
-    # Get or create the profile for the logged-in user
-    # .get_or_create returns a tuple (object, created_boolean)
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-
+    """
+    Handles fetching (GET) and creating/updating (POST/PUT) a user's health profile.
+    """
+    # For a GET request, we only try to retrieve the profile.
     if request.method == 'GET':
-        # For a new profile, these might be null or default values
-        return JsonResponse({
-            'age': profile.age,
-            'weight_kg': profile.weight_kg,
-            'height_cm': profile.height_cm,
-            'activity_level': profile.activity_level,
-            'dietary_preferences': profile.dietary_preferences,
-            'allergies': profile.allergies,
-            'health_issues': profile.health_issues
-        })
-        
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+            # Serialize the data to return as JSON
+            data = {
+                'age': profile.age,
+                'weight_kg': profile.weight_kg,
+                'height_cm': profile.height_cm,
+                'activity_level': profile.activity_level,
+                'dietary_preferences': profile.dietary_preferences,
+                'allergies': profile.allergies,
+                'health_issues': profile.health_issues
+            }
+            return JsonResponse(data)
+        except UserProfile.DoesNotExist:
+            # If profile doesn't exist, return 404.
+            return JsonResponse({'error': 'User profile not found. Please create it first.'}, status=404)
+
+    # For POST or PUT, we handle creating or updating the profile.
     elif request.method in ['POST', 'PUT']:
         try:
             data = json.loads(request.body)
-            # Update profile fields from data, keeping existing values if a field is not provided
-            profile.age = data.get('age', profile.age)
-            profile.weight_kg = data.get('weight_kg', profile.weight_kg)
-            profile.height_cm = data.get('height_cm', profile.height_cm)
-            profile.activity_level = data.get('activity_level', profile.activity_level)
-            profile.dietary_preferences = data.get('dietary_preferences', profile.dietary_preferences)
-            profile.allergies = data.get('allergies', profile.allergies)
-            profile.health_issues = data.get('health_issues', profile.health_issues)
             
-            profile.save()
-            return JsonResponse({'message': 'Profile updated successfully.'})
+            # Use update_or_create to safely handle both creating and updating.
+            profile, created = UserProfile.objects.update_or_create(
+                user=request.user,
+                defaults=data  # Use the incoming data to create or update
+            )
+            
+            message = 'Profile created successfully.' if created else 'Profile updated successfully.'
+            return JsonResponse({'message': message})
+            
         except (KeyError, json.JSONDecodeError):
-            return JsonResponse({'error': 'Invalid JSON data.'}, status=400)
+            return JsonResponse({'error': 'Invalid or malformed data.'}, status=400)
 
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # For any other method, return an error.
+    return JsonResponse({'error': f'Method {request.method} not allowed'}, status=405)
 
 
 # --- Diet Plan Endpoints ---
@@ -70,11 +74,12 @@ def diet_plan_view(request):
     if request.method == 'GET':
         try:
             plan = DietPlan.objects.get(user=request.user, is_active=True)
-            return JsonResponse(plan.plan_details, safe=False)
+            return JsonResponse(plan.plan_details)
         except DietPlan.DoesNotExist:
             return JsonResponse({'error': 'No active diet plan found. Generate one first.'}, status=404)
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 @csrf_exempt
 @login_required
