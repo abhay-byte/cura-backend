@@ -10,9 +10,9 @@ set -o errexit
 echo "--- Starting build process ---"
 
 # --- 1. Initialize and Update Git Submodules ---
-echo "Syncing and updating submodules to the latest version..."
-git submodule sync --recursive
-git submodule update --init --remote --merge
+# echo "Syncing and updating submodules to the latest version..."
+# git submodule sync --recursive
+# git submodule update --init --remote --merge
 
 # --- 2. Install All Project Dependencies ---
 echo "Installing all project dependencies via Poetry..."

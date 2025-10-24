@@ -81,7 +81,7 @@ def run_tests(base_url):
         print("   Waiting for diet plan generation...")
         r = session.post(base_url + "/api/diet/plan/generate/")
         print_status(r, "/api/diet/plan/generate/")
-        time.sleep(5) # Give the agent some time
+        time.sleep(5)
 
         r = session.get(base_url + "/api/diet/plan/")
         print_status(r, "/api/diet/plan/")
