@@ -18,6 +18,8 @@ requests = "^2.32.4"
 gunicorn = "^23.0.0"
 honcho = "^2.0.0"
 django-crontab = "^0.7.1"
+flask = "^3.1.2"
+sqlalchemy = "^2.0.44"
 
 
 [build-system]
